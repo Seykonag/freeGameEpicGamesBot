@@ -1,0 +1,25 @@
+bot:
+  name: epicgames_free_game_bot
+  token: 7431020392:AAGWzrLvXReVWkvGvtm0fZAofeKNq50ibyQ
+
+yandex:
+  folder-id: b1gj72eslelbhlkkpbkl
+  api-url: https://translate.api.cloud.yandex.net/translate/v2/translate
+
+server:
+  port: 8081
+
+spring:
+  datasource:
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: password
+    url: jdbc:h2:file:./data/testdb
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
