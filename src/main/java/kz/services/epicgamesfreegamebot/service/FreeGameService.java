@@ -44,6 +44,8 @@ public class FreeGameService {
         if (!elements.isEmpty()) {
 
             for (int i = 0; i < elements.length(); i++) {
+                if (!checkValid(elements.getJSONObject(i))) continue;
+
                 Game game = Game.builder()
                         .title(elements.getJSONObject(i).getString("title"))
                         .description(elements.getJSONObject(i).getString("description"))
@@ -61,6 +63,44 @@ public class FreeGameService {
                 if (!gameRepository.existsByTitle(game.getTitle())) gameRepository.save(game);
             }
         }
+    }
+
+    private static boolean checkValid(JSONObject object) {
+        if (!object.has("promotions") || object.isNull("promotions")) return false;
+
+        JSONArray promotionalOffersArray = new JSONArray();
+
+        // Проверка наличия "promotionalOffers" и "upcomingPromotionalOffers"
+        if (object.has("promotions")) {
+            JSONObject promotions = object.getJSONObject("promotions");
+            if (promotions.has("promotionalOffers")) {
+                promotionalOffersArray = promotions.getJSONArray("promotionalOffers");
+            }
+            if (promotionalOffersArray.isEmpty() && promotions.has("upcomingPromotionalOffers")) {
+                promotionalOffersArray = promotions.getJSONArray("upcomingPromotionalOffers");
+            }
+        }
+        else return false;
+
+        // Проверка, что массив содержит элементы
+        if (promotionalOffersArray.isEmpty()) {
+            throw new JSONException("No promotional offers found");
+        }
+
+        // Получение первого элемента "promotionalOffers"
+        JSONObject promotionalOffer = promotionalOffersArray.getJSONObject(0);
+        JSONArray promotionalOffersInnerArray = promotionalOffer.getJSONArray("promotionalOffers");
+
+        // Проверка, что внутренний массив содержит элементы
+        if (promotionalOffersInnerArray.isEmpty()) {
+            throw new JSONException("Inner promotionalOffers array is empty");
+        }
+
+        // Получение первого элемента внутреннего массива
+        JSONObject offerDetails = promotionalOffersInnerArray.getJSONObject(0).getJSONObject("discountSetting");
+        int discount = offerDetails.getInt("discountPercentage");
+
+        return discount == 0;
     }
 
     private static String parseImageUrl(JSONArray array) {

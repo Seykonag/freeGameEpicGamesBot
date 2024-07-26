@@ -64,13 +64,22 @@ public class TelegramBotServiceImpl implements TelegramBotService {
 
     public void sendFreeGame(Long chatId) {
         try {
-            List<FreeGameDto> games = freeGameDtoList(gameRepository.findAll());
+            List<Game> allGames = gameRepository.findAll();
+            List<FreeGameDto> games = freeGameDtoList(allGames);
 
             sendMessage(chatId, "Сейчас в раздаче: ");
 
             for (FreeGameDto game : games) {
                 sendPhotoWithCaption(chatId, game.getImageUrl(), game.toString());
             }
+
+            sendMessage(chatId, "Следующим в раздаче будет:");
+            List<FreeGameDto> nextGames = nextGames(GameMapper.freeGameDtoList(allGames));
+
+            for (FreeGameDto nextGame: nextGames) {
+                sendPhotoWithCaption(chatId, nextGame.getImageUrl(), nextGame.toString());
+            }
+
         } catch (NullPointerException exc) {
             throw new RuntimeException("Это пиздец братишка");
         }
@@ -157,6 +166,26 @@ public class TelegramBotServiceImpl implements TelegramBotService {
 
         return keyboardMarkup;
     }
+
+    private List<FreeGameDto> nextGames(List<FreeGameDto> games) {
+        LocalDateTime now = LocalDateTime.now();
+        List<FreeGameDto> nextGames = new ArrayList<>();
+        LocalDateTime nextStartDate = null;
+
+        for (FreeGameDto game : games) {
+            if (game.getStartDate().isAfter(now)) {
+                if (nextStartDate == null || game.getStartDate().isBefore(nextStartDate)) {
+                    nextStartDate = game.getStartDate();
+                    nextGames.clear();
+                    nextGames.add(game);
+                } else if (game.getStartDate().isEqual(nextStartDate)) {
+                    nextGames.add(game);
+                }
+            }
+        }
+        return nextGames;
+    }
+
 
     private List<FreeGameDto> freeGameDtoList(List<Game> games) {
         List<FreeGameDto> gamesDto = new ArrayList<>();
