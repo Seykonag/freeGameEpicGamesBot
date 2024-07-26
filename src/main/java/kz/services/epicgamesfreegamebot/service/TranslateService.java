@@ -1,5 +1,6 @@
 package kz.services.epicgamesfreegamebot.service;
 
+import lombok.Setter;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,6 +13,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
+@Setter
 @Service
 public class TranslateService {
 
@@ -19,7 +21,7 @@ public class TranslateService {
     private String FOLDER_ID;
 
     @Value("${yandex.api-url}")
-    private String API_URL = "https://translate.api.cloud.yandex.net/translate/v2/translate";
+    private String API_URL;
 
     private static final String TARGET_LANGUAGE = "ru";
 
@@ -87,7 +89,7 @@ public class TranslateService {
     private static String parseTranslationResponse(String response) {
         JSONObject jsonResponse = new JSONObject(response);
         JSONArray translations = jsonResponse.getJSONArray("translations");
-        if (translations.length() > 0) {
+        if (!translations.isEmpty()) {
             return translations.getJSONObject(0).getString("text");
         }
         return null;

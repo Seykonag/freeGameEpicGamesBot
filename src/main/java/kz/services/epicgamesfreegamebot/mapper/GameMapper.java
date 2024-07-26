@@ -20,16 +20,11 @@ public class GameMapper {
 
     public static List<FreeGameDto> freeGameDtoList(List<Game> games) {
         List<FreeGameDto> freeGameDtoList = new ArrayList<>();
+
         for (Game game: games) {
-            freeGameDtoList.add(FreeGameDto.builder()
-                    .title(game.getTitle())
-                    .description(game.getDescription())
-                    .imageUrl(game.getImageUrl())
-                    .price(game.getPrice())
-                    .startDate(game.getStartDate())
-                    .endDate(game.getEndDate())
-                    .build());
+            freeGameDtoList.add(freeGameDto(game));
         }
+
         return freeGameDtoList;
     }
 }

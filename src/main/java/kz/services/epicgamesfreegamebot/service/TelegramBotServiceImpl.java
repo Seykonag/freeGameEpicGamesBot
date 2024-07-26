@@ -20,6 +20,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -117,17 +118,6 @@ public class TelegramBotServiceImpl implements TelegramBotService {
         }
     }
 
-    public void sendPhoto(Long chatId, String photoUrl) {
-        SendPhoto sendPhotoRequest = new SendPhoto();
-        sendPhotoRequest.setChatId(String.valueOf(chatId));
-        sendPhotoRequest.setPhoto(new InputFile(photoUrl));
-        try {
-            telegramBot.execute(sendPhotoRequest);
-        } catch (TelegramApiException exc) {
-            // Обработка исключения
-        }
-    }
-
     public void sendMessage(Long chatId, String textToSend){
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(String.valueOf(chatId));
@@ -157,7 +147,7 @@ public class TelegramBotServiceImpl implements TelegramBotService {
         List<KeyboardRow> keyboard = new ArrayList<>();
         KeyboardRow rowAdd = new KeyboardRow();
 
-        for (String row: rows) rowAdd.add(row);
+        rowAdd.addAll(Arrays.asList(rows));
 
         keyboard.add(rowAdd);
 
